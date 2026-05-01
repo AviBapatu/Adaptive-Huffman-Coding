@@ -93,9 +93,12 @@ def main():
     print(f"Static Huffman:     {static_size} bits (payload only, tree cost not included)")
     
     print("\nExplanation:")
-    print("Characters like 'a' occur frequently, so their node weight increases.")
-    print("This pushes them closer to the root, reducing their code length from multiple bits to a single bit.")
-    print("Static Huffman appears smaller here, but it requires transmitting the tree, which is not included in this metric.")
+    print("Adaptive Huffman coding dynamically updates the tree as data is processed.")
+    print("Characters that appear more frequently gain higher weights and move closer to the root,")
+    print("resulting in shorter codes over time.")
+    print("\nStatic Huffman appears more efficient here because it uses complete frequency knowledge in advance.")
+    print("However, it requires transmitting the tree, which is not included in this metric.")
+    print("Adaptive Huffman is more suitable for streaming data where prior knowledge is unavailable.")
 
     from collections import Counter
     freqs = Counter(text)
@@ -110,13 +113,16 @@ def main():
     most_len = len(tree.get_code(tree.nodes_by_symbol[most_char]))
     least_len = len(tree.get_code(tree.nodes_by_symbol[least_char]))
     
+    most_len_str = "1 bit" if most_len == 1 else f"{most_len} bits"
+    least_len_str = "1 bit" if least_len == 1 else f"{least_len} bits"
+    
     print("\nObservation:")
     if most_freq == least_freq:
         print("All characters have equal frequency, so their code lengths remain similar.")
         print("Differences in code length here are due to tree structure evolution during adaptive updates.")
     else:
-        print(f"{repr(most_char)} appears more frequently, so it gets shorter code ({most_len} bits).")
-        print(f"{repr(least_char)} appears less frequently, so it retains longer code ({least_len} bits).")
+        print(f"{repr(most_char)} appears more frequently, so it gets shorter code ({most_len_str}).")
+        print(f"{repr(least_char)} appears less frequently, so it retains longer code ({least_len_str}).")
 
 if __name__ == "__main__":
     main()
