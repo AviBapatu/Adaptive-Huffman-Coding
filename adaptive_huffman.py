@@ -68,11 +68,18 @@ class AdaptiveHuffmanTree:
         return leader
 
     def _update_tree(self, node):
+        actions = []
         curr = node
         while curr is not self.root:
             leader = self._find_block_leader(curr.weight)
             # If a leader exists, is different from curr, and is not curr's parent, swap them
             if leader is not None and leader != curr and leader != curr.parent:
+                actions.append(f"Found block leader (weight = {curr.weight})")
+                sym1 = repr(curr.symbol) if curr.symbol else "*"
+                sym2 = repr(leader.symbol) if leader.symbol else "*"
+                if sym1.startswith("'") and sym1.endswith("'"): sym1 = sym1[1:-1]
+                if sym2.startswith("'") and sym2.endswith("'"): sym2 = sym2[1:-1]
+                actions.append(f"Swapped nodes: ({sym1} <-> {sym2})")
                 self._swap_nodes(curr, leader)
             
             # Increment weight
@@ -81,6 +88,11 @@ class AdaptiveHuffmanTree:
         
         # Increment root weight
         self.root.weight += 1
+        
+        if not actions:
+            actions.append("No swap required (already block leader)")
+            
+        return actions
 
     def process_char(self, char):
         """
@@ -93,7 +105,6 @@ class AdaptiveHuffmanTree:
             ascii_code = format(ord(char), '08b')
             output_code = nyt_code + ascii_code
             status = "NEW"
-            action = f"Insert node for '{char}', split NYT"
 
             # Split NYT node
             old_nyt = self.nyt_node
@@ -120,16 +131,19 @@ class AdaptiveHuffmanTree:
             # We don't increment old_nyt weight here directly, 
             # the _update_tree will handle it by starting from old_nyt.
             # However, new_char_node is already weight 1, so old_nyt should be updated starting from there
-            self._update_tree(old_nyt)
+            update_actions = self._update_tree(old_nyt)
+            actions = [f"Insert node for {repr(char)}", "split NYT"] + update_actions
+            action = ", ".join(actions)
 
         else:
             # 2. Existing character
             char_node = self.nodes_by_symbol[char]
             output_code = self.get_code(char_node)
             status = "EXISTING"
-            action = f"Increment weight, Swap if needed"
             
-            self._update_tree(char_node)
+            update_actions = self._update_tree(char_node)
+            actions = ["Increment weight"] + update_actions
+            action = ", ".join(actions)
 
         return status, output_code, action
 

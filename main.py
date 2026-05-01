@@ -25,10 +25,8 @@ def run_demo(text, steps=15):
                 nyt_len = len(out_code) - 8
                 nyt_part = out_code[:nyt_len] if nyt_len > 0 else ""
                 ascii_part = out_code[-8:]
-                if nyt_part:
-                    print(f"Output: {nyt_part} + {ascii_part}")
-                else:
-                    print(f"Output: {ascii_part}")
+                nyt_desc = f"NYT code {nyt_part}" if nyt_part else "(NYT empty)"
+                print(f"Output: {nyt_desc} + ASCII({repr(char)}) = {out_code}")
             else:
                 print(f"Code: {out_code}")
                 
@@ -66,7 +64,9 @@ def main():
         print("\nERROR: Decoding verification failed! The decoded text does not match the original.")
         return
     else:
-        print("\n[OK] Decoding successful. Decoded text perfectly matches original input.")
+        print(f"\nOriginal Text : {text}")
+        print(f"Decoded Text  : {decoded_text}")
+        print(f"Match Status  : {str(text == decoded_text).upper()}")
     
     # Save outputs
     with open("encoded.txt", "w", encoding="utf-8") as f:
@@ -84,18 +84,33 @@ def main():
     static_size = len(static_bits)
     
     # Print Metrics
+    print("\n--- Switching to full execution mode ---")
     print("\n" + "="*50)
     print(" COMPRESSION METRICS")
     print("="*50)
     print(f"Original size:      {original_size} bits")
     print(f"Adaptive (FGK):     {adaptive_size} bits")
-    print(f"Static Huffman:     {static_size} bits (payload only)")
+    print(f"Static Huffman:     {static_size} bits (payload only, tree cost not included)")
     
     print("\nExplanation:")
-    print("Frequent characters are moved closer to the root of the tree dynamically.")
-    print("This results in progressively shorter codes for those characters.")
-    print("Static Huffman is better when the full data is known in advance.")
-    print("Adaptive Huffman is useful for streaming scenarios where a prior pass is impossible.")
+    print("Characters like 'a' occur frequently, so their node weight increases.")
+    print("This pushes them closer to the root, reducing their code length from multiple bits to a single bit.")
+    print("Static Huffman appears smaller here, but it requires transmitting the tree, which is not included in this metric.")
+
+    from collections import Counter
+    freqs = Counter(text)
+    print("\nCharacter Frequency:")
+    for char, count in freqs.most_common():
+        print(f"{repr(char)} -> {count}")
+    
+    most_char = freqs.most_common()[0][0]
+    least_char = freqs.most_common()[-1][0]
+    most_len = len(tree.get_code(tree.nodes_by_symbol[most_char]))
+    least_len = len(tree.get_code(tree.nodes_by_symbol[least_char]))
+    
+    print("\nObservation:")
+    print(f"{repr(most_char)} appears more frequently, so it gets shorter code ({most_len} bits).")
+    print(f"{repr(least_char)} appears less frequently, so it retains longer code ({least_len} bits).")
 
 if __name__ == "__main__":
     main()
