@@ -49,6 +49,11 @@ def main():
 
     with open(input_file, "r", encoding="utf-8") as f:
         text = f.read()
+
+    # Sanitize unicode smart quotes and enforce pure 8-bit ASCII to prevent 
+    # NYT node bitstream length desyncs (variable-width >8 bit binary artifacts)
+    text = text.replace('‘', "'").replace('’', "'").replace('“', '"').replace('”', '"')
+    text = text.encode('ascii', errors='ignore').decode('ascii')
         
     if not text:
         print("Empty input file.")

@@ -173,34 +173,41 @@ class AdaptiveHuffmanTree:
 
     def decode(self, bitstring):
         decoded_text = ""
-        curr = self.root
-        i = 0
+        current = self.root
+        bit_iter = iter(bitstring)
         
-        while i < len(bitstring):
-            # If tree is just NYT (at start) or we reached NYT
-            if curr == self.nyt_node:
-                # Read 8 bits for ASCII
-                if i + 8 <= len(bitstring):
-                    ascii_bits = bitstring[i:i+8]
-                    char = chr(int(ascii_bits, 2))
-                    decoded_text += char
-                    self.process_char(char)
-                    i += 8
-                    curr = self.root
-                    continue
-                else:
-                    break # Not enough bits left
-                    
-            if bitstring[i] == '0':
-                curr = curr.left
-            else:
-                curr = curr.right
-                
-            if curr.is_leaf() and curr != self.nyt_node:
-                decoded_text += curr.symbol
-                self.process_char(curr.symbol)
-                curr = self.root
-                
-            i += 1
+        # Initial empty tree check
+        if current == self.nyt_node:
+            ascii_bits = ""
+            for _ in range(8):
+                try: ascii_bits += next(bit_iter)
+                except StopIteration: break
+            if len(ascii_bits) == 8:
+                char = chr(int(ascii_bits, 2))
+                decoded_text += char
+                self.process_char(char)
+            current = self.root
             
+        for bit in bit_iter:
+            if bit == '0':
+                current = current.left
+            else:
+                current = current.right
+                
+            if current.is_leaf():
+                if current == self.nyt_node:
+                    ascii_bits = ""
+                    for _ in range(8):
+                        try: ascii_bits += next(bit_iter)
+                        except StopIteration: break
+                    if len(ascii_bits) == 8:
+                        char = chr(int(ascii_bits, 2))
+                        decoded_text += char
+                        self.process_char(char)
+                else:
+                    decoded_text += current.symbol
+                    self.process_char(current.symbol)
+                    
+                current = self.root   # VERY IMPORTANT
+                
         return decoded_text
