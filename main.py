@@ -88,6 +88,9 @@ def main():
     adaptive_size = len(encoded_bits)
     static_size = len(static_bits)
     
+    compression_ratio = adaptive_size / original_size if original_size > 0 else 1.0
+    compression_reduction = (1 - compression_ratio) * 100
+    
     # Print Metrics
     print("\n--- Switching to full execution mode ---")
     print("\n" + "="*50)
@@ -96,6 +99,7 @@ def main():
     print(f"Original size:      {original_size} bits")
     print(f"Adaptive (FGK):     {adaptive_size} bits")
     print(f"Static Huffman:     {static_size} bits (payload only, tree cost not included)")
+    print(f"Compression Ratio:  {compression_ratio:.2f} (Reduction: ~{compression_reduction:.0f}%)")
     
     print("\nExplanation:")
     print("Adaptive Huffman coding dynamically updates the tree as data is processed.")
