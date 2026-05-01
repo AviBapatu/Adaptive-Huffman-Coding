@@ -105,12 +105,18 @@ def main():
     
     most_char = freqs.most_common()[0][0]
     least_char = freqs.most_common()[-1][0]
+    most_freq = freqs.most_common()[0][1]
+    least_freq = freqs.most_common()[-1][1]
     most_len = len(tree.get_code(tree.nodes_by_symbol[most_char]))
     least_len = len(tree.get_code(tree.nodes_by_symbol[least_char]))
     
     print("\nObservation:")
-    print(f"{repr(most_char)} appears more frequently, so it gets shorter code ({most_len} bits).")
-    print(f"{repr(least_char)} appears less frequently, so it retains longer code ({least_len} bits).")
+    if most_freq == least_freq:
+        print("All characters have equal frequency, so their code lengths remain similar.")
+        print("Differences in code length here are due to tree structure evolution during adaptive updates.")
+    else:
+        print(f"{repr(most_char)} appears more frequently, so it gets shorter code ({most_len} bits).")
+        print(f"{repr(least_char)} appears less frequently, so it retains longer code ({least_len} bits).")
 
 if __name__ == "__main__":
     main()
