@@ -89,6 +89,7 @@ At the end of the demonstration, the script calculates:
 * **Original Size:** Length of the raw uncompressed ASCII text.
 * **Adaptive (FGK) Size:** The total length of the dynamically generated bitstream.
 * **Static Huffman Size:** The total length of the conventionally mapped bitstream.
+* **Compression Ratio & Reduction:** The percentage by which the original payload size was reduced by the adaptive algorithm.
 
 **Note:** Static Huffman appears more efficient initially because it leverages complete frequency knowledge in advance. However, static methods natively require transmitting the frequency table or tree to the decoder (which incurs overhead not included in raw payload metrics). Adaptive Huffman requires no such overhead, excelling in unpredictable data streams.
 
