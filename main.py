@@ -1,5 +1,5 @@
 import os
-from adaptive_huffman import AdaptiveHuffmanTree
+from adaptive_huffman_tree import AdaptiveHuffmanTree
 from static_huffman import static_huffman_compress
 
 def run_demo(text, steps=15):
