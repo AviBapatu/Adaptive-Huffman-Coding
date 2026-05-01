@@ -80,6 +80,7 @@ class AdaptiveHuffmanTree:
                 if sym1.startswith("'") and sym1.endswith("'"): sym1 = sym1[1:-1]
                 if sym2.startswith("'") and sym2.endswith("'"): sym2 = sym2[1:-1]
                 actions.append(f"Swapped nodes: ({sym1} <-> {sym2})")
+                actions.append("Maintaining sibling property: nodes reordered within same weight group")
                 self._swap_nodes(curr, leader)
             
             # Increment weight
